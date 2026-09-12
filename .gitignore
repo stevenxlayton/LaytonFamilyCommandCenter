@@ -1,0 +1,16 @@
+# VirtualBox disk image — 6 GB, lives here but never in git
+*.vdi
+*.vbox
+*.vbox-prev
+*.nvram
+*.sav
+
+# Home Assistant secrets if ever copied out of the VM
+secrets.yaml
+*.token
+.storage/
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
