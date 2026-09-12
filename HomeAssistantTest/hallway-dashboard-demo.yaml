@@ -1,0 +1,84 @@
+views:
+  - title: Hallway
+    path: hallway
+    type: sections
+    max_columns: 3
+    sections:
+
+      - type: grid
+        cards:
+          - type: markdown
+            content: >-
+              # {{ now().strftime('%-I:%M') }}
+
+              {{ now().strftime('%A, %B %-d') }}
+
+          - type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+            show_current: true
+            show_forecast: true
+
+          - type: markdown
+            content: >-
+              ### Tonight
+
+              **Chicken tinga tacos**
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights
+
+          - type: tile
+            entity: light.kitchen_lights
+            name: Kitchen
+            features:
+              - type: light-brightness
+
+          - type: tile
+            entity: light.ceiling_lights
+            name: Living room
+            features:
+              - type: light-brightness
+
+          - type: tile
+            entity: light.bed_light
+            name: Bedroom
+
+          - type: heading
+            heading: Fans
+
+          - type: tile
+            entity: fan.living_room_fan
+            name: Living room fan
+            features:
+              - type: fan-speed
+
+          - type: tile
+            entity: fan.ceiling_fan
+            name: Bedroom fan
+            features:
+              - type: fan-speed
+
+      - type: grid
+        cards:
+          - type: heading
+            heading: Media
+
+          - type: tile
+            entity: media_player.living_room
+            name: Living room TV
+
+          - type: heading
+            heading: Climate
+
+          - type: thermostat
+            entity: climate.ecobee
+
+          - type: heading
+            heading: Plugs
+
+          - type: tile
+            entity: switch.decorative_lights
+            name: Porch plug
