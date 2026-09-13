@@ -31,8 +31,8 @@ what "done" means for each, and what's gated behind what. Update the status colu
 
 | # | Module | Status | Real stuff? |
 | --- | --- | --- | --- |
-| 0 | Housekeeping | **In progress** | No |
-| 1 | Home Assistant fundamentals | Not started | No — demo |
+| 0 | Housekeeping | Done | No |
+| 1 | Home Assistant fundamentals | **Next** | No — demo |
 | 2 | Dashboard build | Not started | No — demo |
 | 3 | Automations | Not started | No — demo |
 | 4 | Calendar and to-do | Not started | Yes — iCloud CalDAV |
@@ -55,8 +55,8 @@ Goal: a clean, versioned project folder and a VM you can't break.
 - [x] `git init`, `.gitignore` the VDI, point at `LaytonFamilyCommandCenter`, push
 - [x] Write this file
 - [x] VirtualBox snapshot `clean-demo-hacs-themes`
-- [ ] **When home, not on plane/hotel Wi-Fi:** switch VM Adapter 1 from NAT to Bridged so HA is
-      on the home LAN. Needed for Modules 4, 7, 8. Until then, HA is at `http://127.0.0.1:8080`.
+- [x] Switched VM Adapter 1 from NAT to Bridged (Wi-Fi). HA is at `http://homeassistant.local`
+      or `http://192.168.1.212` on the home LAN. `127.0.0.1:8080` no longer works.
 
 Done when: all boxes checked and `git status` is clean.
 
