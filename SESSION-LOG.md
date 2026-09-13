@@ -181,6 +181,25 @@ connected — Steven is away from home. Server hardware not yet purchased.
 - Music service in use — Amazon Music doesn't run natively on HomePod
 - Whether to switch cameras off Ring, and to what
 
+---
+
+## 2026-09-12 — Workstation split (pre-Module 1)
+
+Decided before Module 1 started; no HA work done in this session.
+
+- **Desktop is the workstation** for HA's web UI and Claude Code sessions (clone of the repo).
+  **Laptop hosts the VM and is the panel stand-in.** HA is bridged on the LAN, so any machine
+  reaches it at `http://192.168.1.212` / `http://homeassistant.local`.
+- VM stays on the laptop through the test phase, including Module 6, so the panel never depends
+  on the desktop being up. Moving it later is ~20 min (File → Export Appliance, re-snapshot).
+- Laptop power settings changed so it can host HA unattended: lid-close on AC = do nothing;
+  sleep and hibernate on AC were already never. Keep it plugged in.
+- **To do on the router:** DHCP reservation for the VM's MAC so `192.168.1.212` can't drift.
+- `Ideas.md` (untracked, Steven + Taylor brainstorm) lists the wider device fleet. Left as-is
+  on Steven's instruction, but Module 7 should read it: ceiling fans are **Hunter** and there
+  are **three** (Gameroom, Nursery, Patio), plus Govee, VeSync, Maytag, Narwal, HondaLink, Dreo,
+  Tuya, Sensi.
+
 ## Reference documents
 
 - `CLAUDE.md` — project spec, decisions, constraints
