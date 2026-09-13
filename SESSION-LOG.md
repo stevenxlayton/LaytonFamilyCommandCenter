@@ -200,8 +200,81 @@ Decided before Module 1 started; no HA work done in this session.
   are **three** (Gameroom, Nursery, Patio), plus Govee, VeSync, Maytag, Narwal, HondaLink, Dreo,
   Tuya, Sensi.
 
+## 2026-09-13 — iCloud CalDAV probe (segue before Module 1)
+
+Steven's call: verify Apple Calendar and Reminders actually reach HA before sinking three weeks
+into Modules 1–3. Correct call — the docs claimed both worked and nobody had tested either.
+
+### What was built
+
+`tools/icloud-caldav-probe.ps1` — PowerShell, no HA involved. Does principal discovery →
+calendar home → lists every collection with type and write access → pulls the next 7 days of
+events and every open reminder → optionally (`-WriteTest`) PUTs one VTODO into a list you pick,
+waits for you to check the phone, then DELETEs it. Prompts for the app-specific password; never
+stores it. Same sequence HA's CalDAV integration performs, so its output is what HA would see.
+
+### Results against Steven's Apple ID
+
+- **Calendar: works completely.** Three calendars (Calendar, Home, Work), all writable. Timed
+  events, all-day events, recurring series (paydays) all present with correct times. HA will
+  render "today's schedule" without further plumbing. iCloud sent us to `p110-caldav.icloud.com`.
+- **Reminders: does not work, and cannot.** The only VTODO collection iCloud exposes is
+  `Reminders ⚠️` holding two placeholder items: "The creator of this list has upgraded these
+  reminders." / "Where are my reminders?" That is Apple's leftover marker from the iOS 13
+  Reminders upgrade (2019). Every real list is in CloudKit and invisible to CalDAV. The write
+  test returned HTTP 201 into the stub — a store no phone displays — so nothing ever reached the
+  phone. **Not a config problem. Taylor's account will show the identical stub. Do not retry.**
+
+`CLAUDE.md`'s "Reminders — works" and the cookbook's "works with iCloud Reminders" were wrong.
+Both corrected. Claude's earlier framing that it "works for most people" was also wrong — the
+HA community reports of iCloud reminder lists appearing are people seeing the same stub.
+
+### Why there's still a path
+
+Apple's doc (support.apple.com/102457, published 2026-06-02): the upgrade "affects existing
+reminders in your primary iCloud account only. Reminders in all other accounts, such as
+secondary iCloud accounts and CalDAV and Exchange accounts, aren't changed." The iOS Reminders
+app still displays lists from those accounts. A June 2026 comment on nextcloud/server#17190
+confirms a third-party CalDAV server still syncs with the Reminders app today, with one hard
+requirement: HTTPS with a certificate iOS trusts, or it silently stops syncing.
+
+Two viable paths, both keep Taylor in the Reminders app:
+
+1. **Household Apple ID added as a secondary account on each phone, Reminders only.** Lists in
+   it stay CalDAV-format; HA reads/writes them like the calendar. No self-hosting, works away
+   from home. Untested — this is the next gate test, ~20 minutes.
+2. **Self-hosted CalDAV add-on** (Nextcloud / Radicale / Baïkal) with a real cert and Tailscale.
+   Fallback.
+
+Rejected: Shortcuts-to-webhook (one-way, panel can't write), and moving the household to
+Bring!/Todoist/Google Tasks (native HA integrations, but that's changing Taylor's app for her).
+
+Cost of either path for Taylor: the shared lists lose upgraded-Reminders features (sections,
+tags, smart lists); the grocery list gets re-entered once; Siri targeting a list in the second
+account is unverified.
+
+### Also learned
+
+- HA's CalDAV integration polls every 15 minutes. A reminder added on a phone can take that long
+  to show on the panel. Fix in Module 4: automation calling `homeassistant.update_entity` on
+  the calendar/todo entities every few minutes.
+- Steven ran the probe in a separate PowerShell window, not the app's terminal pane, and pasted
+  the output. That works fine; the app terminal was empty, which caused a false "it never ran."
+
+### Current state
+
+Calendar path proven. Reminders path identified but unproven. Docs corrected. Module 1 still
+next after the secondary-account gate test.
+
+### Next steps
+
+1. Gate test for the secondary-account path (steps in `MODULES.md`, Module 4).
+2. If it passes, Taylor adds the account, Siri test, her decision on moving the shared lists.
+3. Back to Module 1.
+
 ## Reference documents
 
 - `CLAUDE.md` — project spec, decisions, constraints
 - `PRIMER.md` — plain-language explainer of how the whole system works
 - `DASHBOARD-COOKBOOK.md` — task-oriented Home Assistant dashboard reference
+- `tools/icloud-caldav-probe.ps1` — iCloud CalDAV probe; run with `-WriteTest` for the round-trip check

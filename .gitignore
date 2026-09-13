@@ -14,3 +14,7 @@ secrets.yaml
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Personal notes with credentials - never commit
+HA Important Info.txt
+*.secrets.txt

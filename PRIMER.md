@@ -216,7 +216,8 @@ real lights.
 *This is the phase that proves the whole thing works. It's also mostly clicking.*
 
 **Phase 2 — Add the services (a few evenings)**
-Install Mealie. Connect iCloud Calendar and Reminders via app-specific password. Get Taylor's
+Install Mealie. Connect iCloud Calendar via app-specific password, and Reminders through the
+household secondary account (see `CLAUDE.md` for why the primary account can't). Get Taylor's
 recipes imported. Nothing touches a wall yet.
 
 **Phase 3 — Build the dashboard (this is the fun part, and it's open-ended)**

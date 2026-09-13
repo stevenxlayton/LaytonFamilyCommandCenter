@@ -48,11 +48,36 @@ the criterion that produced the devices that will be hardest to bring in.
 
 ## Apple integration
 
-- **Calendar — works.** iCloud Calendar over CalDAV using an app-specific password. This is well
-  trodden and reliable in practice, though worth knowing that Apple has never officially documented
-  iCloud CalDAV support, so it is a stable-but-unpromised path.
-- **Reminders — works.** iCloud Reminders lists come through the same CalDAV integration and
-  surface as Home Assistant to-do entities, which are readable and writable from the dashboard.
+- **Calendar — verified 2026-09-13.** iCloud Calendar over CalDAV using an app-specific password.
+  Tested with `tools/icloud-caldav-probe.ps1` against Steven's account: all three calendars,
+  timed and all-day events, recurring series, all writable. Worth knowing that Apple has never
+  officially documented iCloud CalDAV support, so it is a stable-but-unpromised path.
+- **Reminders — does NOT work through a primary iCloud account.** Tested the same day: the only
+  to-do collection iCloud exposes over CalDAV is a stub named `Reminders ⚠️` containing Apple's
+  placeholder text ("The creator of this list has upgraded these reminders"). Every real list
+  lives in CloudKit since the iOS 13 "upgrade" and is invisible to CalDAV. Not a config issue;
+  Taylor's account will show the identical stub. Do not retry.
+
+  Apple's own doc (support.apple.com/102457, June 2026) says the upgrade "affects existing
+  reminders in your primary iCloud account only. Reminders in all other accounts, such as
+  secondary iCloud accounts and CalDAV and Exchange accounts, aren't changed." That leaves two
+  workable paths, both of which keep Taylor in the Reminders app she already uses:
+
+  1. **Secondary iCloud account (preferred, untested as of 2026-09-13).** Create a household
+     Apple ID, add it on each phone as a *second* account with only Reminders enabled. Lists in
+     that account stay in the legacy CalDAV format, appear in the Reminders app alongside the
+     personal ones, and HA reads/writes them via CalDAV exactly like the calendar. No
+     self-hosting, reachable from anywhere. Costs: the shared lists lose upgraded features
+     (sections, tags, smart lists), the existing grocery list gets re-created once, and Siri
+     targeting a list in the second account needs a test.
+  2. **Self-hosted CalDAV server** (Nextcloud / Radicale / Baïkal add-on). Confirmed working with
+     the iOS Reminders app as of June 2026, but the server **must be HTTPS with a certificate
+     iOS trusts** or Reminders silently refuses to sync, and phones need to reach it away from
+     home (Tailscale). More plumbing; fallback if path 1 fails.
+
+  Rejected: iOS Shortcuts pushing lists to a webhook (one-way, panel can't write back), and
+  switching the household to Bring!/Todoist/Google Tasks (native HA integrations, but that is a
+  migration performed on Taylor, not offered to her).
 - **Notes — no supported path.** Apple publishes no API for Notes, and it does not sync over CalDAV.
   Nothing pulls Apple Notes into a web dashboard cleanly. The only realistic bridge is an iOS
   Shortcut pushing note content to a Home Assistant webhook on a schedule or on demand — the same
@@ -244,7 +269,8 @@ The project is now larger than a dashboard build. Order of operations:
 1. Inventory every smart device by brand and model; determine which have Home Assistant
    integrations and which are Alexa-only.
 2. Stand up Home Assistant and get devices in. This is the long pole, not the panel.
-3. Wire up iCloud Calendar and Reminders via CalDAV.
+3. Wire up iCloud Calendar via CalDAV (verified). Reminders need the secondary-account approach
+   above — prove it before building anything that depends on the to-do entities.
 4. Build the dashboard against a real instance with real entities.
 5. Choose hardware, test-fit, **then** cut drywall.
 

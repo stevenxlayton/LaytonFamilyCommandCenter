@@ -92,7 +92,7 @@ things.
 
 **light** — a big brightness dial for one light. Tile with a brightness feature is usually better.
 
-**todo-list** — a checkable list. Works with local lists and iCloud Reminders alike.
+**todo-list** — a checkable list. Works with local lists and any CalDAV to-do list. iCloud Reminders only reach CalDAV from a *secondary* iCloud account — see `CLAUDE.md`, Apple integration.
 
 **calendar** — month/day/list agenda view.
 
