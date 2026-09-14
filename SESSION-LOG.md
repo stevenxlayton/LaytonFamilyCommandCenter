@@ -261,16 +261,48 @@ account is unverified.
 - Steven ran the probe in a separate PowerShell window, not the app's terminal pane, and pasted
   the output. That works fine; the app terminal was empty, which caused a false "it never ran."
 
+### Secondary-account gate test — passed, same day
+
+Steven created a household Apple ID from Settings → Apps → Reminders → Reminders Accounts → Add
+Account → iCloud (free @icloud.com address, his cell as the trusted number), attached it with
+only Reminders on, renamed the description "Household", and built the per-store lists in it.
+Generated an app-specific password for that ID at account.apple.com (2FA code arrives by SMS —
+the phone is not a trusted device for a secondary account).
+
+Probe against the household account:
+
+- Principal and calendar home resolved (iCloud routed this account to `p139-caldav`).
+- **No `Reminders ⚠️` stub.** Nothing was ever upgraded on this account.
+- 2 default calendars (Home, Work), both writable, both empty. HA will create entities for
+  them; disable those entities or leave them for a shared household calendar later.
+- **6 Reminders lists — Aldi, Publix, Reminders (default), Sam's, Target, Walmart — all
+  writable.** One list per store, which is what the Phase 4 note predicted the CalDAV world
+  would force. Steven had already done it.
+- Write test into Walmart: HTTP 201, item visible in the Reminders app on his phone, DELETE
+  returned 204 and it disappeared. That is the Module 4 "done" criterion, proven without HA.
+
+Repo is public on GitHub, so the household login is deliberately not in any committed file.
+It lives in `HA Important Info.txt` (gitignored). The app-specific password for the household
+ID goes into HA's CalDAV integration and nowhere else.
+
+**Every route was mapped before committing to this one** (secondary iCloud, self-hosted CalDAV,
+Exchange/Outlook.com + Microsoft Graph, Mac-as-bridge via EventKit, phone Shortcuts, IFTTT,
+reverse-engineered icloud.com API, switching list apps). The only one that would have kept
+Taylor's existing lists untouched with two-way sync needs an always-on Mac; there is none in the
+house (two iPhones, one iPad). Secondary iCloud account was chosen as the least-plumbing,
+no-self-hosting, works-anywhere option.
+
 ### Current state
 
-Calendar path proven. Reminders path identified but unproven. Docs corrected. Module 1 still
-next after the secondary-account gate test.
+Calendar and Reminders both proven end to end over iCloud CalDAV. Docs corrected. Module 4 is
+de-risked; what remains there is HA plumbing plus two human tests (Taylor's phone, Siri).
 
 ### Next steps
 
-1. Gate test for the secondary-account path (steps in `MODULES.md`, Module 4).
-2. If it passes, Taylor adds the account, Siri test, her decision on moving the shared lists.
-3. Back to Module 1.
+1. Taylor adds the household account on her phone; Siri test ("add bread to the Walmart list").
+2. Revoke the app-specific password on Steven's *personal* Apple ID — it was only for the
+   probe, it's in a plaintext notes file and in a chat transcript, and nothing will use it.
+3. Back to Module 1 as planned.
 
 ## Reference documents
 

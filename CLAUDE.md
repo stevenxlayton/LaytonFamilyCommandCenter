@@ -63,13 +63,16 @@ the criterion that produced the devices that will be hardest to bring in.
   secondary iCloud accounts and CalDAV and Exchange accounts, aren't changed." That leaves two
   workable paths, both of which keep Taylor in the Reminders app she already uses:
 
-  1. **Secondary iCloud account (preferred, untested as of 2026-09-13).** Create a household
-     Apple ID, add it on each phone as a *second* account with only Reminders enabled. Lists in
-     that account stay in the legacy CalDAV format, appear in the Reminders app alongside the
-     personal ones, and HA reads/writes them via CalDAV exactly like the calendar. No
-     self-hosting, reachable from anywhere. Costs: the shared lists lose upgraded features
-     (sections, tags, smart lists), the existing grocery list gets re-created once, and Siri
-     targeting a list in the second account needs a test.
+  1. **Secondary iCloud account — VERIFIED 2026-09-13. This is the path.** A household Apple ID
+     is added on each phone as a *second* iCloud account with only Reminders enabled. Lists in
+     that account stay in the legacy CalDAV format, appear in the Reminders app under a
+     "Household" heading alongside the personal ones, and HA reads/writes them via CalDAV
+     exactly like the calendar. Probe result: six per-store lists (Aldi, Publix, Sam's, Target,
+     Walmart, plus the default "Reminders"), all writable; an item written over CalDAV appeared
+     on the phone and a DELETE removed it. No self-hosting, reachable from anywhere. The login
+     is in `HA Important Info.txt`, which is gitignored because this repo is public. Costs: the
+     shared lists lose upgraded features (sections, tags, smart lists), the existing grocery
+     list gets re-entered once, and Siri targeting a list in the second account is still untested.
   2. **Self-hosted CalDAV server** (Nextcloud / Radicale / Baïkal add-on). Confirmed working with
      the iOS Reminders app as of June 2026, but the server **must be HTTPS with a certificate
      iOS trusts** or Reminders silently refuses to sync, and phones need to reach it away from

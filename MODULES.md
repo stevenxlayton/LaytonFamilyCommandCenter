@@ -35,7 +35,7 @@ what "done" means for each, and what's gated behind what. Update the status colu
 | 1 | Home Assistant fundamentals | **Next** | No — demo |
 | 2 | Dashboard build | Not started | No — demo |
 | 3 | Automations | Not started | No — demo |
-| 4 | Calendar and to-do | **Probe done 2026-09-13** — calendar verified, reminders blocked pending account decision | Yes — iCloud CalDAV |
+| 4 | Calendar and to-do | **Gate passed 2026-09-13** — calendar and reminders both round-trip via CalDAV; Taylor's phone + Siri still to test | Yes — iCloud CalDAV |
 | 5 | Mealie | Not started | No |
 | 6 | Panel simulation | Not started | No |
 | 7 | Device discovery | Not started | Yes — Kasa, Roku (read-only) |
@@ -116,16 +116,21 @@ under *Apple integration*.
 
 - [x] Probe Steven's account: 3 calendars, events with times, recurring series, writable. Good.
 - [x] Probe Reminders: stub only. Dead end — do not retry against Taylor's account, same result.
-- [ ] **Gate test for the secondary-account path** (~20 min, no HA needed): create a household
-      Apple ID; on Steven's phone add it under Settings → Apps → Reminders → Accounts as a second
-      iCloud account with only Reminders on; make a test list with two items; generate an
-      app-specific password for *that* ID; run the probe with `-WriteTest`. Pass = the list shows
-      as a "Reminders list" with its items, and the written item appears on the phone in seconds.
-- [ ] If pass: Taylor adds the same account on her phone. Test Siri ("add eggs to the Groceries
-      list") against a list in the second account. Decide with her whether the shared lists move
-      there — the cost is losing sections/tags on those lists and re-entering the grocery list once.
-- [ ] If fail: self-hosted CalDAV add-on (Nextcloud/Radicale/Baïkal) — HTTPS with a trusted
-      cert is mandatory for the iOS Reminders app, plan on Tailscale for off-LAN sync.
+- [x] **Gate test for the secondary-account path — PASSED 2026-09-13.** Household Apple ID
+      created on Steven's phone, attached as a second iCloud account with only Reminders on.
+      Probe against that account: no `Reminders ⚠️` stub, 2 default calendars (Home, Work) and
+      **6 Reminders lists (Aldi, Publix, Reminders, Sam's, Target, Walmart), all writable.**
+      Write test: item created over CalDAV appeared in the Reminders app on the phone, DELETE
+      removed it again. The household login lives in `HA Important Info.txt` (gitignored — the
+      repo is public); the app-specific password goes into HA's CalDAV integration and nowhere else.
+- [ ] Taylor adds the same account on her phone (Settings → Apps → Reminders → Reminders Accounts
+      → Add Account → iCloud → sign in → only Reminders on → rename description "Household").
+- [ ] Siri test from either phone: "Add bread to the Walmart list." Pass = lands in Household →
+      Walmart. If Siri asks which list or picks the personal account, note it and plan around it.
+- [ ] Taylor decides whether the real grocery lists move to the household account. Cost: no
+      sections/tags on those lists; items re-entered once. Her call, not a migration done to her.
+- [ ] Self-hosted CalDAV (Nextcloud/Radicale/Baïkal, trusted HTTPS cert + Tailscale) is the
+      fallback only if Apple ever breaks the secondary-account path. Not needed now.
 - [ ] Then in HA: Local Calendar / Local To-do first (mock), then CalDAV integration with the
       chosen account. Calendar card views (`list` vs day/week), merged agenda across calendars,
       `todo-list` card with add/check from the panel.
