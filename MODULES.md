@@ -12,6 +12,9 @@ what "done" means for each, and what's gated behind what. Update the status colu
 - **Start a new session when:** you switch modules, a session hits a big dead end (fresh context
   beats polluted context), or Claude starts repeating itself or forgetting earlier decisions.
 - **Stay in a session while** iterating on one thing.
+- **HA host is moving off the laptop.** From 2026-09-15 (planned) Home Assistant runs bare-metal
+  on the J4105 mini PC, wired to the router — see `HAOS-INSTALL.md`. The laptop becomes the panel
+  stand-in only. Until that install is done, the VM rules below still apply.
 - **Run the VM plugged in.** This laptop hard-freezes on battery, and a freeze mid-write can
   corrupt the disk image. Take a VirtualBox snapshot before anything risky.
 

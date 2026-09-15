@@ -304,9 +304,80 @@ de-risked; what remains there is HA plumbing plus two human tests (Taylor's phon
    probe, it's in a plaintext notes file and in a chat transcript, and nothing will use it.
 3. Back to Module 1 as planned.
 
+## 2026-09-14 — The J4105 box (pre-Module 1)
+
+Steven brought home a Celeron J4105 mini PC he'd bought for a small work project (BIOS project
+name `CE-S7`; 4C/4T @ 1.5 GHz, 8 GB, 128 GB M.2 2242 SATA SSD, gigabit Ethernet, Windows 11
+Pro). Question: can it be the server or the panel PC?
+
+### Assessment
+
+- CPU is roughly 2× a Home Assistant Green / Pi 4, half an N100, and about 1/8 of the GEEKOM
+  IT13 the plan calls for. It runs HA + Mealie + CalDAV + Kasa/Roku + HomeKit Bridge with
+  headroom. It cannot do Frigate object detection without a Coral, 8 GB is the platform
+  ceiling, and the only storage slot is M.2 2242 — no room for a recording drive.
+- Live camera view on the panel does not need Frigate (go2rtc relays without transcoding, and
+  Reolinks detect on-camera), so the camera concern is narrower than the server sizing implies.
+- Fine as the panel PC if fanless — but work could recall it, so it can't go in the wall or be
+  the brain of the house.
+- **Decision: it is the test-phase HA host, bare-metal HAOS, replacing the laptop VM.** Not the
+  production server, not the panel. The after-the-gates purchase plan is unchanged. Moving to
+  the real box later is HAOS backup → restore.
+- HAOS in Hyper-V on top of Windows was considered and dropped: the Windows license is a retail
+  digital entitlement (no firmware key; generic Pro key, "Licensed"), so a clean Windows
+  reinstall is free and self-activating if work ever wants it back. Nothing on the drive is
+  worth keeping.
+
+### BIOS — done 2026-09-14
+
+AMI Aptio 5.13, build 10/13/2025. Access level Administrator (no password). Boot mode UEFI,
+Fast Boot off, Secure Boot disabled by Steven. Fixed boot order #1 UEFI USB, #2 UEFI Hard
+Disk, so a stick boots on its own and the SSD takes over once it's pulled. The SSD lists under
+"Hard Disk" not "NVME" → SATA → `/dev/sda` in Linux. Save key on this board is **F4**.
+
+### What was built
+
+- `HAOS-INSTALL.md` — the step-by-step for tomorrow. Rendered to PDF in `Downloads` and
+  `C:\Layton_Shared` so it's readable on the phone.
+- `tools/haos-install.sh` — run from a live Ubuntu session on the box. Finds the latest HAOS
+  generic-x86-64 image, picks the non-USB disk, requires typing the disk name and `YES`, writes
+  it with `dd`. Untested against the box until tomorrow.
+- `tools/j4105-preflight.ps1` — Windows-side checks (UEFI, Secure Boot, disks, Ethernet MAC)
+  with `-Bios` / `-Usb` reboot shortcuts. Ended up unnecessary — USB is already boot #1 and
+  Secure Boot was flipped by hand — but it's there.
+- `tools/md-to-pdf.ps1` — Markdown → PDF through headless Chrome, since the desktop has no
+  Python or pandoc.
+- Also fixed the desktop's `Layton_Shared` SMB share: share permissions had Everyone, NTFS
+  didn't. Added `Everyone: Modify` on `C:\Layton_Shared`.
+
+### Concepts that needed explaining — keep explaining these
+
+- Why an OS install needs a USB stick at all: a machine can't overwrite the drive it's running
+  from, so something else has to run it for twenty minutes.
+- What Ubuntu is, and that "Try Ubuntu" is a temporary workbench, not something being installed.
+- Rufus erases the whole stick, and plain Windows Format won't restore its full size afterward.
+
+### Current state
+
+BIOS ready. Guide and scripts written and pushed. Nothing on the J4105 has changed yet — it is
+still Windows. The laptop VM is still the running HA instance.
+
+### Next steps
+
+1. Steven runs `HAOS-INSTALL.md`. Needs an 8 GB+ USB stick and an Ethernet cable to the box.
+   Ends with the laptop VM's backup restored on the J4105 and the VM shut down.
+2. Router: DHCP reservation for the J4105's wired MAC (reuse `.212` or reserve whatever it got).
+3. The 2026-09-12 workstation split becomes: HA host = J4105 on Ethernet; laptop = panel
+   stand-in only; desktop = workstation.
+4. Then Module 1.
+
 ## Reference documents
 
 - `CLAUDE.md` — project spec, decisions, constraints
 - `PRIMER.md` — plain-language explainer of how the whole system works
 - `DASHBOARD-COOKBOOK.md` — task-oriented Home Assistant dashboard reference
 - `tools/icloud-caldav-probe.ps1` — iCloud CalDAV probe; run with `-WriteTest` for the round-trip check
+- `HAOS-INSTALL.md` — bare-metal HAOS install on the J4105 box, step by step
+- `tools/haos-install.sh` — the disk-writing script the guide runs from a live Ubuntu session
+- `tools/md-to-pdf.ps1` — render any of these docs to PDF
+
