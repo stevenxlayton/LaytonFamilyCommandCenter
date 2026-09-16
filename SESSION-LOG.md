@@ -371,6 +371,44 @@ still Windows. The laptop VM is still the running HA instance.
    stand-in only; desktop = workstation.
 4. Then Module 1.
 
+
+## 2026-09-15 — HAOS on the J4105: done
+
+Steven ran `HAOS-INSTALL.md` end to end. Home Assistant is up bare-metal on the J4105 (wired MAC
+`00:f1:f5:38:4f:30`), restored from the laptop VM's backup. Laptop VM is off; the laptop is the
+panel stand-in only.
+
+- **Port 80, not 8123.** The restored config carried the VM's port setting over, as the guide
+  predicted. The address is `http://192.168.1.212` with no port.
+- **DHCP reservation lesson.** Steven set a fixed allocation `.212` → that MAC on the BGW320
+  correctly, but the box kept its first lease (`.215`) and the gateway list showed the device
+  under `.212` marked *off*, which looked like a failure and wasn't. A reservation only applies
+  when the device next asks for an address → reboot the box (HA → Settings → System → power
+  icon → Advanced options → **Reboot system**; *Restart Home Assistant* keeps the old lease).
+- Update `HA Important Info.txt` with the new address.
+
+### Module 7 leads from the gateway's IP Allocation list (2026-09-15)
+
+Pulled from the BGW320 while sorting out the reservation. Not verified in HA yet.
+
+| Seen on the network | What it probably is | HA path |
+| --- | --- | --- |
+| `SIMPLEconnect Fan M2-306c8d` (1 of 3 online) | **Hunter SIMPLEconnect** Wi-Fi fan — that line is HomeKit-native | HA **HomeKit Device** integration pairs with it directly and locally. No Bond bridge. Caveat: a HomeKit accessory pairs with one controller only, so it must not already be in Apple Home. Confirm the other two fans are the same model. |
+| `EP10` ×10, `KL125` ×1 | Kasa smart plugs and a Kasa bulb | Native Kasa integration, local. Should auto-discover. |
+| `AmazonPlug176U`, `AmazonPlug0T6D` | Amazon-branded plugs | No path. On the replace list, as planned. |
+| `StudyRoku` | Roku | Native, local. |
+| `viziocastdisplay` ×3 | The three Vizios | Control via Roku per plan. |
+| `RingDoorbell-c4`, `RingFloodlightCam-a3` | Ring | Cloud-only; deferred. |
+| `Sensi-238590` | Sensi thermostat | Native Sensi integration (cloud). |
+| `Levoit-purifier` ×2 | Levoit / VeSync | Native VeSync integration (cloud). |
+| `eufyOmniE25`, `NARWAL_e57625` | Robot vacuums | Community integrations at best; not on the panel. |
+| `espressif` ×2 | ESP-based devices, likely Govee/Dreo/Tuya gear | Identify in Module 7. |
+| `Amazon Technologies Inc.` at `.122` | An Echo | Alexa stays; nothing to do. |
+| `ArcherAX80` | The spare TP-Link router | Not in scope. |
+
+Dozens of `Watch` / `iPhone` / `iPad` rows with random MACs are Apple private-address churn, not
+separate devices.
+
 ## Reference documents
 
 - `CLAUDE.md` — project spec, decisions, constraints

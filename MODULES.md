@@ -12,9 +12,9 @@ what "done" means for each, and what's gated behind what. Update the status colu
 - **Start a new session when:** you switch modules, a session hits a big dead end (fresh context
   beats polluted context), or Claude starts repeating itself or forgetting earlier decisions.
 - **Stay in a session while** iterating on one thing.
-- **HA host is moving off the laptop.** From 2026-09-15 (planned) Home Assistant runs bare-metal
-  on the J4105 mini PC, wired to the router — see `HAOS-INSTALL.md`. The laptop becomes the panel
-  stand-in only. Until that install is done, the VM rules below still apply.
+- **HA host is the J4105 mini PC** (done 2026-09-15): bare-metal HAOS, wired to the router, at
+  `http://192.168.1.212` (port 80, no `:8123`). See `HAOS-INSTALL.md`. The laptop is the panel
+  stand-in only. The VM is off and kept as a fallback; the VM rule below no longer applies.
 - **Run the VM plugged in.** This laptop hard-freezes on battery, and a freeze mid-write can
   corrupt the disk image. Take a VirtualBox snapshot before anything risky.
 
@@ -174,6 +174,8 @@ Goal: confirm HA sees the real fleet. Read-only, Alexa untouched. Requires Bridg
 - Roku: auto-discover, test app launch and **HDMI-CEC power-on** on the Vizio. This decides
   whether the TV cards get a power button.
 - Ceiling fans: physically inspect, identify brand/model, determine path (Bond / Tuya / other).
+  **Lead (2026-09-15):** one shows on the network as a Hunter *SIMPLEconnect* Wi-Fi fan, which is
+  HomeKit-native → HA's **HomeKit Device** integration, local, no bridge. Check the other two.
 - Replace the demo entities on the dashboard with real ones.
 
 Done when: every non-Amazon device is in HA and controllable from the panel, and the fan path
